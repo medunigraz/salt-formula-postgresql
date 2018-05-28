@@ -1,10 +1,10 @@
 {%- from "postgresql/map.jinja" import server with context %}
 {%- from "postgresql/map.jinja" import cluster with context %}
-{%- if server.enabled %}
+{%- if server.get('enabled', False) %}
 
 postgresql_packages:
   pkg.installed:
-  {% if cluster.get("enabled", False) and cluster.get("mode") == "bdr" %}
+  {% if cluster.get('enabled', False) and cluster.get("mode") == "bdr" %}
   - names: {{ server.bdr_pkgs }}
   {% else %}
   - names: {{ server.pkgs }}

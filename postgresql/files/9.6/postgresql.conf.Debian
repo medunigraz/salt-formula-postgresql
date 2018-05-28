@@ -236,11 +236,11 @@ dynamic_shared_memory_type = posix # the default is the first option
 
 # - Sending Server(s) -
 
-{%- if cluster.enabled and cluster.get("mode") == "hot_standby" and cluster.role != "master" %}
+{%- if cluster.get('enabled', False) and cluster.get("mode") == "hot_standby" and cluster.role != "master" %}
 hot_standby = on
 {%- endif %}
 
-{%- if cluster.enabled and cluster.get("mode") == "hot_standby" and cluster.role == "master" %}
+{%- if cluster.get('enabled', False) and cluster.get("mode") == "hot_standby" and cluster.role == "master" %}
 
 wal_level = hot_standby
 archive_mode = {{ cluster.archive }}
