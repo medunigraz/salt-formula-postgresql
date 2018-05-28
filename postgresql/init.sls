@@ -1,4 +1,4 @@
-
+{%- if pillar.postgresql is defined %}
 include:
 {% if pillar.postgresql.server is defined %}
 - postgresql.server
@@ -8,4 +8,5 @@ include:
 {% endif %}
 {% if pillar.postgresql.cluster is defined %}
 - postgresql.cluster
+{% endif %}
 {% endif %}
