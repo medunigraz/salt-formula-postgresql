@@ -10,8 +10,7 @@ postgresql_packages:
   - names: {{ server.pkgs }}
   {% endif %}
 
-{%- if grains.os_family == "Debian" %}
-
+{%- if cluster.get("enabled", False) %}
 init_postgresql_cluster:
   postgres_cluster.present:
   - name: main
@@ -25,6 +24,7 @@ init_postgresql_cluster:
   - require_in:
     - file: {{ server.dir.config }}/pg_hba.conf
     - file: {{ server.dir.config }}/postgresql.conf
+{%- endif %}
 
 {{ server.dir.config }}/pg_hba.conf:
   file.managed:
@@ -44,8 +44,6 @@ init_postgresql_cluster:
     postgresql_version: {{ server.version }}
   - mode: 600
 
-{%- endif %}
-
 /root/.pgpass:
   file.managed:
   - source: salt://postgresql/files/pgpass
@@ -53,8 +51,6 @@ init_postgresql_cluster:
   - user: root
   - group: root
   - mode: 600
-
-{%- if grains.os_family == "Debian" %}
 
 postgresql_service:
   service.running:
@@ -69,16 +65,16 @@ postgresql_service:
   - require:
     - file: /root/.pgpass
 
-{%- for database_name, database in server.get('database', {}).iteritems() %}
+{%- for database_name, database in server.get('database', {}).items() %}
   {%- include "postgresql/_database.sls" %}
 
-  {%- for extension_name, extension in database.get('extension', {}).iteritems() %}
+  {%- for extension_name, extension in database.get('extension', {}).items() %}
     {%- if extension.enabled %}
     {%- if extension.get('pkgs', []) %}
 
 postgresql_{{ extension_name }}_extension_packages:
   pkg.installed:
-  - names: {{ pkgs }}
+  - names: {{ extension.get('pkgs', []) }}
 
     {%- endif %}
 
@@ -91,12 +87,12 @@ database_{{ database_name }}_{{ extension_name }}_extension_present:
   - onlyif: /bin/false
   {%- endif %}
   - require:
-    - postgres_database: postgresql_database_{{ database_name }}
+    - postgres_database: {{ database_name }}
 
     {%- else %}
 
 database_{{ database_name }}_{{ extension_name }}_extension_absent:
-  postgres_extension.present:
+  postgres_extension.absent:
   - name: {{ extension_name }}
   - maintenance_db: {{ database_name }}
   - user: postgres
@@ -104,13 +100,11 @@ database_{{ database_name }}_{{ extension_name }}_extension_absent:
   - onlyif: /bin/false
   {%- endif %}
   - require:
-    - postgres_database: postgresql_database_{{ database_name }}
+    - postgres_database: {{ database_name }}
 
     {%- endif %}
   {%- endfor %}
 {%- endfor %}
-
-{%- endif %}
 
 postgresql_dirs:
   file.directory:
