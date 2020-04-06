@@ -37,23 +37,6 @@
     },
 }, merge=salt['pillar.get']('postgresql:server')) %}
 
-{%- set cluster = salt['grains.filter_by']({
-    'Debian': {
-        'enabled': false,
-        'pkgs': [],
-        'service': 'postgresql',
-        'version': version,
-        'init_command': 'pg_createcluster {:s} main --start'.format(version),
-        'dir': {
-          'config': '/etc/postgresql/{:s}/main'.format(version),
-          'data': '/var/lib/postgresql/{:s}/main'.format(version)
-        },
-        'archive': "off",
-        'synchronous': False,
-        'wal_level': 'hot_standby'
-    }
-}, merge=salt['pillar.get']('postgresql:cluster')) %}
-
 {%- set client = salt['grains.filter_by']({
     'Debian': {
         'pkgs': ['postgresql-client'],

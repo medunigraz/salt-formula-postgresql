@@ -6,7 +6,4 @@ include:
 {% if pillar.postgresql.client is defined %}
 - postgresql.client
 {% endif %}
-{% if pillar.postgresql.cluster is defined %}
-- postgresql.cluster
-{% endif %}
 {% endif %}

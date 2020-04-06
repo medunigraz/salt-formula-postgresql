@@ -1,30 +1,9 @@
 {%- from "postgresql/map.jinja" import server with context %}
-{%- from "postgresql/map.jinja" import cluster with context %}
 {%- if server.get('enabled', False) %}
 
 postgresql_packages:
   pkg.installed:
-  {% if cluster.get('enabled', False) and cluster.get("mode") == "bdr" %}
-  - names: {{ server.bdr_pkgs }}
-  {% else %}
   - names: {{ server.pkgs }}
-  {% endif %}
-
-{%- if cluster.get("enabled", False) %}
-init_postgresql_cluster:
-  postgres_cluster.present:
-  - name: main
-  - version: "{{ server.version }}"
-  - datadir: "{{ server.dir.data }}"
-  {%- if grains.get('noservices') %}
-  - onlyif: /bin/false
-  {%- endif %}
-  - require:
-    - pkg: postgresql_packages
-  - require_in:
-    - file: {{ server.dir.config }}/pg_hba.conf
-    - file: {{ server.dir.config }}/postgresql.conf
-{%- endif %}
 
 {{ server.dir.config }}/pg_hba.conf:
   file.managed:
