@@ -40,15 +40,15 @@
 # option or PGDATA environment variable, represented here as ConfigDir.
 
 data_directory = '{{ server.dir.data }}'        # use data in another directory
-					# (change requires restart)
-hba_file = '/etc/postgresql/10/main/pg_hba.conf'	# host-based authentication file
-					# (change requires restart)
-ident_file = '/etc/postgresql/10/main/pg_ident.conf'	# ident configuration file
-					# (change requires restart)
+          # (change requires restart)
+hba_file = '/etc/postgresql/{{ server.version }}/{{ server.cluster }}/pg_hba.conf'  # host-based authentication file
+          # (change requires restart)
+ident_file = '/etc/postgresql/{{ server.version }}/{{ server.cluster }}/pg_ident.conf'  # ident configuration file
+          # (change requires restart)
 
 # If external_pid_file is not explicitly set, no extra PID file is written.
-external_pid_file = '/var/run/postgresql/10-main.pid'			# write an extra PID file
-					# (change requires restart)
+external_pid_file = '/run/postgresql/{{ server.version }}.{{ server.cluster }}.pid'     # write an extra PID file
+          # (change requires restart)
 
 
 #------------------------------------------------------------------------------
@@ -493,8 +493,8 @@ log_timezone = 'localtime'
 
 # - Process Title -
 
-cluster_name = '10/main'			# added to process titles if nonempty
-					# (change requires restart)
+cluster_name = '{{ server.version }}/{{ server.cluster }}'      # added to process titles if nonempty
+          # (change requires restart)
 #update_process_title = on
 
 
@@ -509,7 +509,7 @@ cluster_name = '10/main'			# added to process titles if nonempty
 #track_io_timing = off
 #track_functions = none			# none, pl, all
 #track_activity_query_size = 1024	# (change requires restart)
-stats_temp_directory = '/var/run/postgresql/10-main.pg_stat_tmp'
+stats_temp_directory = '/var/run/postgresql/{{ server.version }}-{{ server.cluster }}.pg_stat_tmp'
 
 
 # - Statistics Monitoring -
