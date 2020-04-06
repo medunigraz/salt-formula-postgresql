@@ -47,7 +47,7 @@ ident_file = '/etc/postgresql/{{ server.version }}/{{ server.cluster }}/pg_ident
           # (change requires restart)
 
 # If external_pid_file is not explicitly set, no extra PID file is written.
-external_pid_file = '/run/postgresql/{{ server.version }}.{{ server.cluster }}.pid'     # write an extra PID file
+external_pid_file = '/run/postgresql/{{ server.version }}-{{ server.cluster }}.pid'     # write an extra PID file
           # (change requires restart)
 
 
