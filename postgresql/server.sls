@@ -35,9 +35,6 @@ postgresql_service:
   service.running:
   - name: {{ server.service }}
   - enable: true
-  {%- if grains.get('noservices') %}
-  - onlyif: /bin/false
-  {%- endif %}
   - watch:
     - file: {{ server.dir.config }}/pg_hba.conf
     - file: {{ server.dir.config }}/postgresql.conf
@@ -62,9 +59,6 @@ database_{{ database_name }}_{{ extension_name }}_extension_present:
   - name: {{ extension_name }}
   - maintenance_db: {{ database_name }}
   - user: postgres
-  {%- if grains.get('noservices') %}
-  - onlyif: /bin/false
-  {%- endif %}
   - require:
     - postgres_database: {{ database_name }}
 
@@ -75,50 +69,10 @@ database_{{ database_name }}_{{ extension_name }}_extension_absent:
   - name: {{ extension_name }}
   - maintenance_db: {{ database_name }}
   - user: postgres
-  {%- if grains.get('noservices') %}
-  - onlyif: /bin/false
-  {%- endif %}
   - require:
     - postgres_database: {{ database_name }}
 
     {%- endif %}
   {%- endfor %}
 {%- endfor %}
-
-postgresql_dirs:
-  file.directory:
-  - names:
-    - /root/postgresql/backup
-    - /root/postgresql/flags
-    - /root/postgresql/data
-    - /root/postgresql/scripts
-  - mode: 700
-  - user: root
-  - group: root
-  - makedirs: true
-  - require:
-    - pkg: postgresql_packages
-
-{%- if server.initial_data is defined %}
-
-{%- set engine = server.initial_data.get("engine", "barman") %}
-
-/root/postgresql/scripts/restore_wal.sh:
-  file.managed:
-  - source: salt://postgresql/files/restore_wal.sh
-  - mode: 770
-  - template: jinja
-  - require:
-    - file: postgresql_dirs
-
-restore_postgresql_server:
-  cmd.run:
-  - name: /root/postgresql/scripts/restore_wal.sh
-  - unless: "[ -f /root/postgresql/flags/restore_wal-done ]"
-  - cwd: /root
-  - require:
-    - file: /root/postgresql/scripts/restore_wal.sh
-
-{%- endif %}
-
 {%- endif %}
