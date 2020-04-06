@@ -5,18 +5,18 @@
 }, grain='oscodename') %}
 
 {%- set version = salt['pillar.get']('postgresql:server:version', default=default_version)|string %}
-{%- set version_numbers = version|replace('.', '') %}
+{%- set cluster = salt['pillar.get']('postgresql:server:cluster', default='main') %}
 {%- set server = salt['grains.filter_by']({
     'Debian': {
         'pkgs': ['postgresql-{:s}'.format(version), 'postgresql-contrib', 'postgresql-doc'],
-        'service': 'postgresql',
+        'service': 'postgresql@{:s}-{:s}'.format(version, cluster),
         'version': version,
         'init_command': 'pg_createcluster {:s} main --start'.format(version),
         'dir': {
-          'config': '/etc/postgresql/{:s}/main'.format(version),
-          'data': '/var/lib/postgresql/{:s}/main'.format(version)
+          'config': '/etc/postgresql/{:s}/{:s}'.format(version, cluster),
+          'data': '/var/lib/postgresql/{:s}/{:s}'.format(version, cluster)
         },
-        'cluster': 'main',
+        'cluster': cluster,
         'locale': 'en_US.UTF-8',
     },
 }, merge=salt['pillar.get']('postgresql:server')) %}
