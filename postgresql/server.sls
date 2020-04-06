@@ -15,7 +15,7 @@ postgresql_packages:
 
 {{ server.dir.config }}/postgresql.conf:
   file.managed:
-  - source: salt://postgresql/files/{{ server.version }}/postgresql.conf.{{ grains.os_family }}
+  - source: salt://postgresql/files/postgresql.conf.{{ grains.os_family }}
   - template: jinja
   - user: postgres
   - group: postgres

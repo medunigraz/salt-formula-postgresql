@@ -1,4 +1,4 @@
-{%- from "postgresql/map.jinja" import server, cluster with context -%}
+{%- from "postgresql/map.jinja" import server with context -%}
 # -----------------------------
 # PostgreSQL configuration file
 # -----------------------------
@@ -231,23 +231,6 @@ dynamic_shared_memory_type = posix  # the default is the first option
 #------------------------------------------------------------------------------
 
 # - Sending Server(s) -
-
-{%- if cluster.enabled and cluster.get("mode") == "hot_standby" and cluster.role != "master" %}
-hot_standby = on
-{%- endif %}
-
-{%- if cluster.enabled and cluster.get("mode") == "hot_standby" and cluster.role == "master" %}
-
-wal_level = hot_standby
-archive_mode = {{ cluster.archive }}
-
-max_wal_senders = {{ cluster.members|length + 1 }}
-max_replication_slots = {{ cluster.members|length + 1 }}
-
-{%- if cluster.synchronous %}
-synchronous_standby_names = '*'
-{%- endif %}
-{%- endif %}
 
 # Set these on the master and on any standby that will send replication data.
 
